@@ -1,5 +1,8 @@
 FROM python:3.11-slim
 
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=5000
+
 WORKDIR /app
 
 COPY requirements.txt .

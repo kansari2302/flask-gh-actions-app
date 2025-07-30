@@ -1,26 +1,26 @@
-from flask import Flask, request, jsonify, render_template_string
+# app/main.py
+from flask import Flask, request, jsonify, abort
+import os
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return render_template_string("""
-        <form action="/submit" method="POST">
-            <input name="username" placeholder="Enter username">
-            <input type="submit">
-        </form>
-    """)
-
-@app.route('/submit', methods=['POST'])
-def submit():
-    username = request.form.get('username')
-    if not username or len(username) > 20:
-        return jsonify({'error': 'Invalid username'}), 400
-    return jsonify({'message': f'Welcome, {username}!'}), 200
-
-@app.route('/status')
-def status():
+@app.route('/', methods=['GET'])
+def health_check():
     return jsonify({"status": "ok"})
 
+@app.route('/api/data', methods=['POST'])
+def process_data():
+    if not request.is_json:
+        abort(400, description="Invalid Content-Type")
+
+    data = request.get_json()
+    if "value" not in data:
+        abort(400, description="Missing 'value' field")
+
+    result = data["value"].upper()
+    return jsonify({"result": result})
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    host = os.environ.get("FLASK_RUN_HOST", "127.0.0.1")
+    port = int(os.environ.get("FLASK_RUN_PORT", 5000))
+    app.run(host=host, port=port)

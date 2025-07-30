@@ -33,6 +33,12 @@ jobs:
       run: |
         pip install safety
         safety check --full-report
+    
+    - name: Run Bandit Security Scan
+      uses: tj-actions/bandit@v4
+      with:
+        path: app
+        options: "-r -lll"
 
     - name: Build Docker image
       run: |
